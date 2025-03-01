@@ -86,7 +86,7 @@ if theme == "Dark Mode":
     )
 
 # URL Input
-url = st.text_input("🔗 Enter a webpage URL:", " ")
+url = st.text_input("🔗 Enter a webpage URL:", "https://www.example.com")
 
 # Extract Button
 extract_button = st.button("🔍 Extract SEO Data")
