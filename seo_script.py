@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+import io
 
 # Load Custom CSS with Light/Dark Mode Support
 def load_custom_css():
@@ -55,7 +57,7 @@ def get_headings(soup):
     headings = []
     for i in range(1, 7):  # Loop through h1 to h6
         for tag in soup.find_all(f'h{i}'):
-            headings.append(f"**H{i}:** {tag.get_text(strip=True)}")
+            headings.append(f"H{i}: {tag.get_text(strip=True)}")
     return headings if headings else ["No headings found."]
 
 # Function to Extract Meta Data
@@ -91,6 +93,26 @@ def fetch_page(url):
     
     except requests.exceptions.RequestException as e:
         return [f"❌ Error fetching the page: {e}"], {}
+
+# Function to Create Excel File
+def create_excel(meta_data, headings):
+    output = io.BytesIO()
+    
+    # Create DataFrame
+    data = {
+        "Meta Title": [meta_data["title"]],
+        "Meta Description": [meta_data["description"]],
+        "Meta Keywords": [meta_data["keywords"]],
+        "Headings": [", ".join(headings)]  # Store headings as comma-separated
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Save to Excel
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False, sheet_name="SEO Data")
+    
+    return output.getvalue()
 
 # Initialize Streamlit App
 st.set_page_config(page_title="SEO Analyzer", layout="wide")
@@ -139,3 +161,12 @@ if st.button("🔍 Analyze Page"):
     st.markdown("### 📑 Extracted Headings:")
     for heading in headings:
         st.markdown(f"<div style='padding:10px; background-color:#222; color:white; border-radius:5px; margin-bottom:5px;'>{heading}</div>", unsafe_allow_html=True)
+
+    # Create Downloadable Excel File
+    excel_data = create_excel(meta_data, headings)
+    st.download_button(
+        label="📥 Download SEO Data as Excel",
+        data=excel_data,
+        file_name="seo_data.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
