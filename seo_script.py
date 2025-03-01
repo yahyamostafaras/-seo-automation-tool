@@ -51,7 +51,30 @@ def load_custom_css():
     st.markdown(css, unsafe_allow_html=True)
 
 # Function to Extract Headings
-def get_headings(url):
+def get_headings(soup):
+    headings = []
+    for i in range(1, 7):  # Loop through h1 to h6
+        for tag in soup.find_all(f'h{i}'):
+            headings.append(f"**H{i}:** {tag.get_text(strip=True)}")
+    return headings if headings else ["No headings found."]
+
+# Function to Extract Meta Data
+def get_meta_data(soup):
+    title = soup.title.string if soup.title else "No Title Found"
+    description = soup.find("meta", attrs={"name": "description"})
+    keywords = soup.find("meta", attrs={"name": "keywords"})
+
+    meta_description = description["content"] if description else "No Meta Description Found"
+    meta_keywords = keywords["content"] if keywords else "No Meta Keywords Found"
+
+    return {
+        "title": title,
+        "description": meta_description,
+        "keywords": meta_keywords
+    }
+
+# Function to Fetch and Parse Page
+def fetch_page(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
@@ -61,18 +84,16 @@ def get_headings(url):
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
-        headings = []
-        for i in range(1, 7):  # Loop through h1 to h6
-            for tag in soup.find_all(f'h{i}'):
-                headings.append(f"**H{i}:** {tag.get_text(strip=True)}")
+        headings = get_headings(soup)
+        meta_data = get_meta_data(soup)
 
-        return headings if headings else ["No headings found."]
+        return headings, meta_data
     
     except requests.exceptions.RequestException as e:
-        return [f"❌ Error fetching the page: {e}"]
+        return [f"❌ Error fetching the page: {e}"], {}
 
 # Initialize Streamlit App
-st.set_page_config(page_title="SEO Heading Extractor", layout="wide")
+st.set_page_config(page_title="SEO Analyzer", layout="wide")
 
 # Load CSS
 load_custom_css()
@@ -87,21 +108,33 @@ else:
     st.markdown('<div class="light-mode">', unsafe_allow_html=True)
 
 # Title and Subtitle
-st.markdown("<h2 style='text-align: center; color: #007bff;'>SEO Heading Extractor</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Developed by <b>Yahya</b> | Extract H1-H6 from any webpage</p>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #007bff;'>SEO Analyzer</h2>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Developed by <b>Yahya</b> | Extract H1-H6, Title, Meta Description & Keywords</p>", unsafe_allow_html=True)
 
 st.write("🔗 **Enter a webpage URL below:**")
 
 # Input URL
 url = st.text_input("Enter URL here", "https://www.replicaairguns.ca/")
 
-# Extract Headings Button
-if st.button("🔍 Extract Headings"):
-    with st.spinner("Fetching headings..."):
-        headings = get_headings(url)
+# Extract Data Button
+if st.button("🔍 Analyze Page"):
+    with st.spinner("Fetching SEO Data..."):
+        headings, meta_data = fetch_page(url)
 
-    st.success("✅ Headings extracted successfully!")
+    st.success("✅ SEO Data extracted successfully!")
     
+    # Display Meta Title
+    st.markdown("### 🏷️ Meta Title:")
+    st.markdown(f"<div style='padding:10px; background-color:#222; color:white; border-radius:5px;'>{meta_data['title']}</div>", unsafe_allow_html=True)
+
+    # Display Meta Description
+    st.markdown("### 📝 Meta Description:")
+    st.markdown(f"<div style='padding:10px; background-color:#222; color:white; border-radius:5px;'>{meta_data['description']}</div>", unsafe_allow_html=True)
+
+    # Display Meta Keywords
+    st.markdown("### 🔑 Meta Keywords:")
+    st.markdown(f"<div style='padding:10px; background-color:#222; color:white; border-radius:5px;'>{meta_data['keywords']}</div>", unsafe_allow_html=True)
+
     # Display Extracted Headings
     st.markdown("### 📑 Extracted Headings:")
     for heading in headings:
