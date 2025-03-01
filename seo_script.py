@@ -61,6 +61,10 @@ def create_excel(meta_data, headings):
 # Streamlit UI
 st.set_page_config(page_title="SEO Extractor", layout="wide")
 
+# Centered Name & Title
+st.markdown("<h1 style='text-align: center; color: #0078FF;'>SEO Data Extractor</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: grey;'>Developed by Yahya</h3>", unsafe_allow_html=True)
+
 # Sidebar Theme Toggle
 st.sidebar.markdown("### Theme Mode")
 theme = st.sidebar.radio("Select Theme", ["Light Mode", "Dark Mode"])
@@ -76,10 +80,6 @@ if theme == "Dark Mode":
         """,
         unsafe_allow_html=True
     )
-
-# App Title
-st.markdown("<h2 style='text-align: center; color: #0078FF;'>SEO Heading Extractor</h2>", unsafe_allow_html=True)
-st.markdown("Developed by **Yahya** | Extract H1-H6 + Meta Tags")
 
 # URL Input
 url = st.text_input("🔗 Enter a webpage URL:", "https://www.example.com")
@@ -110,7 +110,7 @@ if st.button("🔍 Extract SEO Data"):
         # Download as Excel
         excel_data = create_excel((title, description), headings)
         st.download_button(
-            label="📥 Download Excel",
+            label="📥 Download SEO Data (Excel)",
             data=excel_data,
             file_name="seo_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
