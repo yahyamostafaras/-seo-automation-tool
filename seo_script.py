@@ -136,7 +136,7 @@ st.markdown("<p style='text-align: center;'>Developed by <b>Yahya</b> | Extract 
 st.write("🔗 **Enter a webpage URL below:**")
 
 # Input URL
-url = st.text_input("Enter URL here", "https://www.replicaairguns.ca/")
+url = st.text_input("Enter URL here", " ")
 
 # Extract Data Button
 if st.button("🔍 Analyze Page"):
