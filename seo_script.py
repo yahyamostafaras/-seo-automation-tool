@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 
-# Streamlit UI
-st.title("SEO Heading Scraper")
-st.write("Enter a URL to extract headings (H1 - H6):")
+# Streamlit UI setup
+st.title("🔍 SEO Heading Extractor")
+st.write("Enter a URL below to extract all H1-H6 headings from the page.")
 
-# Input field
-url = st.text_input("Enter the URL:")
+# User input field
+url = st.text_input("Enter the URL:", "")
 
 # Function to fetch and parse HTML headings
 def get_headings(url):
@@ -30,11 +31,14 @@ def get_headings(url):
         return headings if headings else ["No headings found."]
 
     except requests.exceptions.RequestException as e:
-        return [f"Error fetching the page: {e}"]
+        return [f"❌ Error fetching the page: {e}"]
 
-# Display results
-if url:
-    st.subheader("Extracted Headings:")
-    headings = get_headings(url)
-    for heading in headings:
-        st.write(heading)
+# Button to trigger the heading extraction
+if st.button("Extract Headings"):
+    if url:
+        st.subheader("📝 Extracted Headings:")
+        headings = get_headings(url)
+        for heading in headings:
+            st.write(heading)
+    else:
+        st.warning("⚠ Please enter a valid URL.")
