@@ -19,9 +19,21 @@ def fetch_html(url):
 # Function to extract meta title & description
 def extract_meta_data(html):
     soup = BeautifulSoup(html, "html.parser")
+
+    # Get Title
     title = soup.title.string.strip() if soup.title else "Title not found"
+
+    # Get Meta Description
     meta_desc = soup.find("meta", attrs={"name": "description"})
-    description = meta_desc["content"].strip() if meta_desc else "Meta description not found"
+    og_desc = soup.find("meta", attrs={"property": "og:description"})
+    
+    if meta_desc and meta_desc.get("content"):
+        description = meta_desc["content"].strip()
+    elif og_desc and og_desc.get("content"):
+        description = og_desc["content"].strip()
+    else:
+        description = "Meta description not found"
+    
     return title, description
 
 # Function to extract all headings (H1-H6)
