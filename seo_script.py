@@ -88,11 +88,15 @@ if theme == "Dark Mode":
 # URL Input
 url = st.text_input("🔗 Enter a webpage URL:", "https://www.example.com")
 
-if st.button("🔍 Extract SEO Data"):
+# Extract Button
+extract_button = st.button("🔍 Extract SEO Data")
+
+# **Trigger extraction when ENTER key is pressed OR button is clicked**
+if url and (extract_button or url):  
     st.write("🔄 Fetching data, please wait...")
-    
+
     html = fetch_html(url)
-    
+
     if "Error fetching page" in html:
         st.error(html)
     else:
@@ -100,7 +104,7 @@ if st.button("🔍 Extract SEO Data"):
         headings = extract_headings(html)
 
         st.success("✅ Data extracted successfully!")
-        
+
         # Display Meta Title & Description
         st.markdown("### 📌 Meta Data")
         st.write(f"**Title:** {title}  _(Characters: {title_length})_")
